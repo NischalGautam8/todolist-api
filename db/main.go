@@ -15,21 +15,25 @@ const (
 	dbname   = "demo"
 )
 
-func Init() {
+var DB *sql.DB
+
+func Init() error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
+
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("error opening database: %v", err)
 	}
-	defer db.Close()
 
+	// Test the connection
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("error connecting to the database: %v", err)
 	}
 
+	DB = db // Assign to the global DB variable
 	fmt.Println("Successfully connected!")
-
+	return nil
 }
