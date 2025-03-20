@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetTasks(c *gin.Context) {
+func GetTask(c *gin.Context) {
 	var tasks []models.Task
 	rows, err := db.DB.Query("SELECT * FROM tasks")
 	if err != nil {

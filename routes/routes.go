@@ -20,7 +20,10 @@ func SetUpRouter() *gin.Engine {
 	authorized := api.Group("/")
 	authorized.Use(middleware.AuthMiddleWare())
 	{
-		authorized.GET("/tasks", handlers.GetTasks)
+		authorized.GET("/tasks", handlers.GetTask)
+		authorized.POST("/tasks", handlers.CreateTask)
+		authorized.PUT("/tasks", handlers.UpdateTask)
+		authorized.DELETE("/tasks/:id", handlers.DeleteTask)
 	}
 	api.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
