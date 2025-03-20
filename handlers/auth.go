@@ -20,23 +20,45 @@ type Claims struct {
 
 func Register(c *gin.Context) {
 	var user models.User
-	//check if input is valid
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Check if username is empty
+	if user.Username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "username cannot be empty"})
+		return
+	}
+
+	// Check if password is empty
+	if user.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "password cannot be empty"})
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
 	user.Password = string(hashedPassword)
-	_, err = db.DB.Exec("insert into user (username , password) values (?,?)", user.Username, user.Password)
+
+	// Execute the query
+	var id int
+	err = db.DB.QueryRow(`INSERT INTO "user" (username, password) VALUES ($1, $2) RETURNING id`,
+		user.Username, user.Password).Scan(&id)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error creating user": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User registered successfully",
+		"id":      id,
+	})
 }
 func Login(c *gin.Context) {
 	var user models.User

@@ -2,38 +2,26 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "nischal"
-	dbname   = "demo"
-)
-
 var DB *sql.DB
 
-func Init() error {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
+func Init() {
+	connStr := "postgres://postgres:nischal@localhost:5432/gopgtest?sslmode=disable"
+	var err error
+	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
-		return fmt.Errorf("error opening database: %v", err)
+		log.Fatalf("Error opening database: %v", err)
 	}
 
 	// Test the connection
-	err = db.Ping()
+	err = DB.Ping()
 	if err != nil {
-		return fmt.Errorf("error connecting to the database: %v", err)
+		log.Fatalf("Error connecting to the database: %v", err)
 	}
 
-	DB = db // Assign to the global DB variable
-	fmt.Println("Successfully connected!")
-	return nil
+	log.Println("Successfully connected to database!")
 }
