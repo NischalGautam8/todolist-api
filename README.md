@@ -1,4 +1,4 @@
-1. Pull the official postgres docker image ` ker pull postg`
+1. Pull the official postgres docker image `docker pull postgres`
 2. Run it `docker run --name pg-container -e POSTGRES_PASSWORD=nischal -p 5432:5432 -d postgres`
 3. `docker exec -ti pg-container psql -U postgres`
 4. connect to gopgtest db `\c gopgtest`
